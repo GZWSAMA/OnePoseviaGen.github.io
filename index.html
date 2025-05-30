@@ -1,0 +1,744 @@
+<!doctype html><meta charset=utf-8>
+<html lang="en-US">
+<head>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap-4.4.1.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link href="css/misc.css" rel="stylesheet" type="text/css">
+    
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', '');
+    </script>
+    <style>
+        .break_word {
+            overflow: hidden;
+            hyphens: auto;
+        }
+    </style>
+</head>
+
+<div class="text-center">
+    <img src="./images/logo.png" class="img-fluid" alt="Input Image" style="width: 60%; height: auto; max-width: 600px;">
+</div>
+<div class="col-sm-9" style="text-align: center; margin: 0 auto;">
+    <h1 class="name" style="margin-top: 0.5rem; margin-bottom: 0.5rem; font-weight: bold;">One View, Many Worlds: Single-Image to 3D Object Meets Generative Domain Randomization for One-Shot 6D Pose Estimation</h1>
+</div>
+
+<!-- Table of Contents -->
+<div class="col-sm-12" style="text-align: center;">
+    <h2>Table of Contents</h2>
+    <ul style="list-style-type: none; padding: 0;">
+        <li><a href="#abstarct">Abstarct</a></li>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#full_video">Full Video</a></li>
+        <li><a href="#experiments">Experiments</a></li>
+    </ul>
+</div>
+
+<div class="main">
+    <section class="section" id="abstarct" style="margin-bottom: 3rem;">
+        <div class="container">
+            <hr></hr>
+            <h1 style="text-align:center; margin-top: 0pt; margin-bottom: 0pt; font-weight: bold; margin-bottom: 1rem;">Abstract</h1>
+            <div class="col-12 break_word">
+                <p style="text-align:leftl;">
+                    Estimating the 6D pose of arbitrary objects from a single reference image is a critical yet challenging task in robotics, especially considering the long-tail distribution of real-world instances. While category-level and model-based approaches have achieved notable progress, they remain limited in generalizing to unseen objects under one-shot settings. In this work, we propose a novel pipeline for fast and accurate one-shot 6D pose and scale estimation. Leveraging recent advances in single-view 3D generation, we first build high-fidelity textured meshes without requiring known object poses. To resolve scale ambiguity, we introduce a coarse-to-fine alignment module that estimates both object size and initial pose by matching 2D-3D features with depth information. We then generate a diversified set of plausible 3D models using text-guided generative augmentation and render them with Blender to synthesize large-scale, domain-randomized training data for pose estiamtion. This synthetic data bridges the domain gap and enables robust fine-tuning of pose estimators. Our method achieves state-of-the-art results on several 6D pose benchmarks, and we further validate its effectiveness on a newly collected in-the-wild dataset. Finally, we integrate our system with a dexterous hand, demonstrating its robustness in real-world robotic grasping tasks. All code, data, and models will be released to foster future research.
+                </p>
+            </div>
+            <div class="text-center">
+                <img src="./images/teaser.png" class="img-fluid" alt="Input Image" style="width: 80%; height: auto; max-width: 700px;">
+                <h5 class="mt-2">Figure 1: Teaser. </h5>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="overview" style="margin-bottom: 3rem;">
+        <div class="container">
+            <hr></hr>
+            <h1 style="text-align:center; margin-top: 0pt; margin-bottom: 0pt; font-weight: bold; margin-bottom: 1rem;">Overview</h1>
+            <div class="col-12 break_word">
+                <p style="text-align:left">
+                    Figure 2 illustrates the overall pipeline of our method. Given an anchor RGB-D image I<sub>A</sub> 
+                    containing an object of interest, our primary challenge is to estimate its 6D pose without a pre-existing 3D model, a common limitation for novel objects. 
+                    To address this, as shown in the top-left of Figure 2, we first leverage recent advancements in single-view 3D generation to create a textured 3D model with a standardized orientation and scale (see Section 3.3). However, this generated model exists in a normalized space and lacks real-world scale.
+                    To recover the object's true size and location in the anchor image frame, we introduce a coarse-to-fine alignment module (see Section 3.4). This module aligns the normalized generated model with the partial object observation in 
+                    I<sub>A</sub>, simultaneously estimating the object's metric scale and initial 6D pose.
+                    Once the metric-scale model in the anchor view is established, we can efficiently estimate the object's pose in subsequent query RGB-D images 
+                    I<sub>Q</sub> (top-right of Figure 2) using the aligned model and a robust pose estimation framework, including a pose selection module to handle potential object symmetries. The final relative transformation 
+                    T<sub>A→Q</sub> is then computed from the absolute poses in both views.
+                    Furthermore, recognizing the domain gap between synthetically generated models and real-world images, as depicted in the lower section of Figure 2, we propose a text-guided generative augmentation strategy (see Section 3.5) to create a diversified set of plausible 3D models. These diversified models are then used to synthesize a large-scale, domain-randomized training dataset, enabling robust fine-tuning of the pose estimation components and bridging the sim-to-real gap, as demonstrated in our experimental results (see Section 4).
+                </p>
+                <div class="text-center">
+                    <img src="./images/overview.png" class="img-fluid" alt="Input Image" style="width: 80%; height: auto; max-width: 700px;">
+                    <h5 class="mt-2">Figure 2: Overview of One-2-3-Pose.</h5>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="full_video" style="margin-bottom: 3rem;">
+        <div class="container">
+            <hr></hr>
+            <h1 style="text-align:center; margin-top: 0pt; margin-bottom: 0pt; font-weight: bold; margin-bottom: 1rem;">Full Video</h1>
+            <div class="text-center">
+                <div style="display: inline-block; position: relative; width: 100%; max-width: 800px;">
+                  <video controls loop style="width: 100%; height: auto;">
+                    <source src="./full_video.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="experiments" style="margin-bottom: 3rem;">
+        <div class="container">
+            <hr></hr>
+            <h1 style="text-align:center; margin-top: 0pt; margin-bottom: 0pt; font-weight: bold; margin-bottom: 1rem;">Experiments</h1>
+            <div class="col-12 break_word">
+                <p style="text-align:left">
+                    <span style="font-weight: bold;">Public datasets.</span> We evaluated our method on three challenging public datasets: YCBInEOAT (robotic interaction), Toyota-Light (TOYL) (challenging lighting), and LINEMOD Occlusion (LM-O) (cluttered, occluded, textureless objects).
+                </p>
+                <p style="text-align:left">
+                    <span style="font-weight: bold;">Real-world evaluation.</span> We performed two experiments in real-world settings: (1) 6D pose estimation for uncommon objects by generating synthetic training data via our domain randomization pipeline and testing on a calibrated real set, and (2) robotic manipulation tasks, establishing grasping setups using a ROKAE robot arm equipped with an XHAND1 dexterous hand, and two AgileX PiPERs, and measuring success rates against baselines.
+                </p>
+            </div><br>
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/1/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/1/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/1/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/1/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/1/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/2/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/2/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/2/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/2/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/2/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/3/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/3/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/3/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/3/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/3/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/4/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/4/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/4/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/4/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/4/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/5/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/5/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/5/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/5/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/5/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/6/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/6/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/6/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/6/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/6/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/7/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/7/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/7/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/7/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/7/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/8/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/8/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/8/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/8/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/8/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/9/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/9/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/9/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/9/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/9/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/10/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/10/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/10/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/10/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/10/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/11/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/11/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/11/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/11/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/11/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/12/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/12/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/12/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/12/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/12/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/14/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/14/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/14/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/14/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/14/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+            <div class="container text-center">
+                <div class="row align-items-center my-4">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center">
+                        <img src="./videos/15/1.jpg" class="img-fluid" alt="Input Image">
+                        <h5 class="mt-2">Anchor Image</h5>
+                    </div>
+                    <div class="col-lg-10 col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/15/2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Aligned Model</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/15/3.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Original Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/15/4.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">Rendered Video</h5>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <video controls loop autoplay muted>
+                                        <source src="./videos/15/5.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                                <h5 class="mt-2">6D Pose Video</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+            <div class="text-center">
+                <img src="./images/ycbineoat_qual_png_00.png" class="img-fluid" alt="Input Image" style="width: 80%; height: auto; max-width: 800px;">
+                <h5 class="mt-2">Figure 3: Qualitative comparison on the YCBInEOAT dataset. .</h5>
+            </div>
+            <div class="text-center">
+                <img src="./images/comparison.png" class="img-fluid" alt="Input Image" style="width: 80%; height: auto; max-width: 800px;">
+            </div>
+        </div>
+    </section>
+</div>
+</html>
