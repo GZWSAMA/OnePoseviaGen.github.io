@@ -235,7 +235,7 @@
 
                 <!-- 图片容器：控制宽度与居中 -->
                 <div class="flex justify-center mt-12">
-                    <div class="w-4/5"> <!-- 60% 宽度 -->
+                    <div class="w-3/5"> <!-- 60% 宽度 -->
                         <img src="images/overview.png" alt="Method Overview" class="w-full rounded-lg shadow-lg">
                         <p class="mt-4 text-center text-gray-600">Figure 2: Overview of OnePoseviaGen</p>
                     </div>
@@ -303,15 +303,42 @@
                         <span class="font-bold">Real-world evaluation.</span> We performed two experiments in real-world settings: (1) 6D pose estimation for uncommon objects by generating synthetic training data via our domain randomization pipeline and testing on a calibrated real set, and (2) robotic manipulation tasks, establishing grasping setups using a ROKAE robot arm equipped with an XHAND1 dexterous hand, and two AgileX PiPERs, and measuring success rates against baselines.
                     </p>
                     <p class="text-gray-700 leading-relaxed mt-4">
+                        <span class="font-bold">The three examples displayed below are randomly selected from our collection to enhance the page loading speed. Should you wish to explore further, simply click on the 'Load More' button to view additional examples.</span>
                     </p>
-                </div>
+                    <p class="text-gray-700 leading-relaxed mt-4">
+                    </p>
+                </div>                
                 
-                <div id="experiments-container"></div>
+                <!-- 添加一个容器用于存放实验区块 -->
+                <div id="experiments-container" class="space-y-8"></div>
+
+                <!-- 添加“加载更多”按钮 -->
+                <div class="flex justify-center mt-6">
+                    <button id="load-more-btn" class="px-16 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">Load More</button>
+                </div>
 
                 <script>
-                // 生成15个实验区块
-                for (let num = 1; num <= 14; num++) {
-                    const experimentHTML = `
+                // 总共的实验数量
+                const totalExperiments = 14;
+
+                // 初始加载的实验数量
+                let loadedExperiments = 2;
+
+                // 随机生成不重复的实验编号数组
+                function getRandomExperiments(num) {
+                    const experiments = [];
+                    while (experiments.length < num) {
+                        const randomNum = Math.floor(Math.random() * totalExperiments) + 1;
+                        if (!experiments.includes(randomNum)) {
+                            experiments.push(randomNum);
+                        }
+                    }
+                    return experiments;
+                }
+
+                // 生成指定编号的实验区块
+                function generateExperimentHTML(num) {
+                    return `
                         <!-- Experiment ${num} -->
                         <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
                             <div class="md:col-span-1">
@@ -322,37 +349,67 @@
                                 <div>
                                     <video controls class="w-full rounded-lg shadow" autoplay loop muted playsinline>
                                         <source src="videos/${num}/2.mp4" type="video/mp4">
-                                        您的浏览器不支持 video 标签。
+                                        Your browser does not support the video tag.
                                     </video>
                                     <p class="mt-2 text-center text-sm text-gray-600">Aligned Model</p>
                                 </div>
                                 <div>
                                     <video controls class="w-full rounded-lg shadow" autoplay loop muted playsinline>
                                         <source src="videos/${num}/3.mp4" type="video/mp4">
-                                        您的浏览器不支持 video 标签。
+                                        Your browser does not support the video tag.
                                     </video>
                                     <p class="mt-2 text-center text-sm text-gray-600">Original Video</p>
                                 </div>
                                 <div>
                                     <video controls class="w-full rounded-lg shadow" autoplay loop muted playsinline>
                                         <source src="videos/${num}/4.mp4" type="video/mp4">
-                                        您的浏览器不支持 video 标签。
+                                        Your browser does not support the video tag.
                                     </video>
                                     <p class="mt-2 text-center text-sm text-gray-600">Rendered Video</p>
                                 </div>
                                 <div>
                                     <video controls class="w-full rounded-lg shadow" autoplay loop muted playsinline>
                                         <source src="videos/${num}/5.mp4" type="video/mp4">
-                                        您的浏览器不支持 video 标签。
+                                        Your browser does not support the video tag.
                                     </video>
                                     <p class="mt-2 text-center text-sm text-gray-600">6D Pose Video</p>
                                 </div>
                             </div>
                         </div>
                     `;
-                    
-                    document.getElementById('experiments-container').insertAdjacentHTML('beforeend', experimentHTML);
                 }
+
+                // 加载初始的实验区块
+                function loadInitialExperiments() {
+                    const initialExperiments = getRandomExperiments(loadedExperiments);
+                    initialExperiments.forEach(num => {
+                        document.getElementById('experiments-container').insertAdjacentHTML('beforeend', generateExperimentHTML(num));
+                    });
+                }
+
+                // 加载更多的实验区块
+                function loadMoreExperiments() {
+                    const remainingExperiments = totalExperiments - loadedExperiments;
+                    const numToLoad = Math.min(3, remainingExperiments); // 每次加载最多3个实验
+                    const newExperiments = getRandomExperiments(numToLoad).filter(num => !Array.from(document.querySelectorAll('#experiments-container > div')).some(el => el.outerHTML.includes(`Experiment ${num}`)));
+                    newExperiments.forEach(num => {
+                        document.getElementById('experiments-container').insertAdjacentHTML('beforeend', generateExperimentHTML(num));
+                    });
+                    loadedExperiments += numToLoad;
+
+                    // 如果所有实验都已加载，则隐藏“加载更多”按钮
+                    if (loadedExperiments >= totalExperiments) {
+                        document.getElementById('load-more-btn').style.display = 'none';
+                    }
+                }
+
+                // 页面加载完成后执行
+                document.addEventListener('DOMContentLoaded', function() {
+                    loadInitialExperiments();
+                    
+                    // 绑定“加载更多”按钮点击事件
+                    document.getElementById('load-more-btn').addEventListener('click', loadMoreExperiments);
+                });
                 </script>
                 
                 <!-- Results Comparison -->
