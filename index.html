@@ -15,18 +15,52 @@
             scroll-behavior: smooth;
         }
         .gradient-text {
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
+        header {
+            min-height: 100vh;
+        }
         .section-card {
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            background: 
+                linear-gradient(rgba(10, 25, 47, 0.9), rgba(10, 25, 47, 0.9)),
+                linear-gradient(to right, rgba(56, 182, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(56, 182, 255, 0.1) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(56, 182, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(56, 182, 255, 0.1) 0%, transparent 40%);
+            pointer-events: none;
         }
         .section-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
+            border: 1px solid rgba(59, 130, 246, 0.7);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
         }
         #canvas-container {
             position: relative;
@@ -45,7 +79,7 @@
             height: 2px;
             bottom: -2px;
             left: 0;
-            background-color: #3b82f6;
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
             transition: width 0.3s ease;
         }
         .nav-link:hover::after {
@@ -53,50 +87,80 @@
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-900">
     <!-- Animated Header -->
-    <header class="relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 text-white" style="padding-top: 27%;">
-        <!-- 使用padding-top技巧来维持16:9的宽高比 -->
-        <video class="absolute inset-0 w-full h-full object-cover opacity-30" autoplay loop muted playsinline>
+    <header class="relative h-screen overflow-hidden text-white">
+        <!-- 背景视频 -->
+        <video class="absolute inset-0 w-full h-full object-cover z-0" autoplay loop muted playsinline>
             <source src="videos/bg.mp4" type="video/mp4">
+            Your browser does not support the video tag.
         </video>
-        <div class="absolute inset-0 flex flex-col justify-center items-center text-center z-10">
-            <h1 class="text-4xl md:text-6xl font-bold mb-6">One View, Many Worlds</h1>
-            <p class="text-xl md:text-2xl mb-8">Single-Image to 3D Object Meets Generative Domain Randomization for One-Shot 6D Pose Estimation</p>
-            
-            <div class="flex flex-wrap justify-center gap-4 mb-8">
-                <a href="https://arxiv.org" class="bg-white text-blue-600 px-4 py-2 rounded-full font-medium hover:bg-blue-50 transition">
-                    <i class="fas fa-file-alt mr-2"></i> arXiv Paper
+
+        <!-- 主蒙版：深色渐变覆盖全屏，增强对比 -->
+        <div class="absolute inset-0 bg-gradient-to-br from-black/75 via-blue-900/70 to-purple-900/60 z-1"></div>
+
+        <!-- 辅助蒙版：底部到顶部的透明渐变，突出文字区域 -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent z-2 opacity-80"></div>
+
+        <!-- 内容区域 -->
+        <div class="absolute inset-0 flex flex-col justify-center items-start z-30 p-8 md:p-12">
+            <div class="animate-float max-w-7xl" style="animation: float 6s ease-in-out infinite">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
+                <span class="gradient-text">One View, Many Worlds</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl leading-relaxed">
+                Single-Image to 3D Object Meets Generative Domain Randomization for One-Shot 6D Pose Estimation
+            </p>
+
+            <div class="flex flex-wrap gap-3 mb-6">
+                <a href="https://arxiv.org" class="bg-white/90 hover:bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 text-sm md:text-base">
+                <i class="fas fa-file-alt mr-2"></i> Paper
                 </a>
-                <a href="https://huggingface.co/spaces/ZhengGeng/OnePoseviaGen" class="bg-white text-purple-600 px-4 py-2 rounded-full font-medium hover:bg-purple-50 transition">
-                    <i class="fas fa-rocket mr-2"></i> Huggingface Demo
+                <a href="https://huggingface.co/spaces/ZhengGeng/OnePoseviaGen" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 text-sm md:text-base">
+                <i class="fas fa-rocket mr-2"></i> Huggingface Demo
                 </a>
-                <a href="https://github.com/gzwsama/OnePoseviaGen" class="bg-white text-gray-800 px-4 py-2 rounded-full font-medium hover:bg-gray-100 transition">
-                    <i class="fab fa-github mr-2"></i> GitHub Code
+                <a href="https://github.com/gzwsama/OnePoseviaGen" class="bg-gray-900 border border-gray-700 hover:border-gray-600 text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 text-sm md:text-base">
+                <i class="fab fa-github mr-2"></i> GitHub Code
                 </a>
             </div>
-            <p class="text-lg">
-                <a href="https://github.com/GZWSAMA" class="text-white hover:underline hover:text-gray-300 transition-colors duration-200">Zheng Geng</a>,
-                <a href="https://bigcileng.github.io/" class="text-white hover:underline hover:text-gray-300 transition-colors duration-200">Nan Wang</a>,
-                <a href="https://daniellli.github.io/" class="text-white hover:underline hover:text-gray-300 transition-colors duration-200">Shaocong Xu</a>,
-                <a href="https://scholar.google.com/citations?user=V-YdQiAAAAAJ&hl=zh-CN" class="text-white hover:underline hover:text-gray-300 transition-colors duration-200">Bohan Li</a>,
-                <a href="https://frozenburning.github.io/" class="text-white hover:underline hover:text-gray-300 transition-colors duration-200">Zhaoxi Chen</a>,
-                <a href="https://hugoycj.github.io/" class="text-white hover:underline hover:text-gray-300 transition-colors duration-200">Chongjie Ye</a>,
-                <a href="http://pengsida.net/" class="text-white hover:underline hover:text-gray-300 transition-colors duration-200">Sida Peng</a>,
-                <a href="https://sites.google.com/view/fromandto" class="text-white hover:underline hover:text-gray-300 transition-colors duration-200">Hao Zhao</a>
+
+            <p class="text-sm md:text-base text-gray-200">
+                <a href="https://github.com/GZWSAMA" class="hover:underline hover:text-gray-300 transition-colors duration-200">Zheng Geng</a>,
+                <a href="https://bigcileng.github.io/" class="hover:underline hover:text-gray-300 transition-colors duration-200">Nan Wang</a>,
+                <a href="https://daniellli.github.io/" class="hover:underline hover:text-gray-300 transition-colors duration-200">Shaocong Xu</a>,
+                <a href="https://scholar.google.com/citations?user=V-YdQiAAAAAJ&hl=zh-CN" class="hover:underline hover:text-gray-300 transition-colors duration-200">Bohan Li</a>,
+                <a href="https://frozenburning.github.io/" class="hover:underline hover:text-gray-300 transition-colors duration-200">Zhaoxi Chen</a>,
+                <a href="https://hugoycj.github.io/" class="hover:underline hover:text-gray-300 transition-colors duration-200">Chongjie Ye</a>,
+                <a href="http://pengsida.net/" class="hover:underline hover:text-gray-300 transition-colors duration-200">Sida Peng</a>,
+                <a href="https://sites.google.com/view/fromandto" class="hover:underline hover:text-gray-300 transition-colors duration-200">Hao Zhao</a>
             </p>
+            </div>
         </div>
     </header>
 
+    <!-- 可选：添加 float 动画 -->
+    <style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    .gradient-text {
+        background: linear-gradient(90deg, #4facfe, #00f2fe);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    </style>
+
     <!-- Navigation -->
-    <nav class="sticky top-0 bg-white shadow-sm z-50">
+    <nav class="sticky top-0 bg-gray-900/80 backdrop-blur-md z-50 border-b border-gray-800/50">
         <div class="container mx-auto px-4 py-4">
-            <div class="flex justify-center space-x-6">
-                <a href="#abstract" class="nav-link text-gray-700 hover:text-blue-600">Abstract</a>
-                <a href="#overview" class="nav-link text-gray-700 hover:text-blue-600">Overview</a>
-                <a href="#video" class="nav-link text-gray-700 hover:text-blue-600">Video</a>
-                <a href="#demo" class="nav-link text-gray-700 hover:text-blue-600">Demo</a>
-                <a href="#experiments" class="nav-link text-gray-700 hover:text-blue-600">Experiments</a>
+            <div class="flex justify-center space-x-8">
+                <a href="#abstract" class="nav-link text-white hover:text-blue-400 px-4 py-2 rounded-full hover:bg-gray-800/50 transition-all">Abstract</a>
+                <a href="#overview" class="nav-link text-white hover:text-blue-400 px-4 py-2 rounded-full hover:bg-gray-800/50 transition-all">Overview</a>
+                <a href="#video" class="nav-link text-white hover:text-blue-400 px-4 py-2 rounded-full hover:bg-gray-800/50 transition-all">Video</a>
+                <a href="#demo" class="nav-link text-white hover:text-blue-400 px-4 py-2 rounded-full hover:bg-gray-800/50 transition-all">Live Demo</a>
+                <a href="#experiments" class="nav-link text-white hover:text-blue-400 px-4 py-2 rounded-full hover:bg-gray-800/50 transition-all">Results</a>
             </div>
         </div>
     </nav>
@@ -104,10 +168,10 @@
     <main class="container mx-auto px-4 py-12">
         <!-- Abstract Section -->
         <section id="abstract" class="mb-20">
-            <div class="bg-white rounded-xl p-8 section-card">
+            <div class="bg-gray-900 rounded-xl p-8 section-card border border-blue-500/20 shadow-lg shadow-blue-500/10">
                 <h2 class="text-3xl font-bold text-center mb-8 gradient-text">Abstract</h2>
                 <div class="prose max-w-4xl mx-auto">
-                    <p class="text-gray-700 leading-relaxed">
+                    <p class="text-gray-300 leading-relaxed">
                         Estimating the 6D pose of arbitrary objects from a single reference image is a critical yet challenging task in robotics, especially considering the long-tail distribution of real-world instances. While category-level and model-based approaches have achieved notable progress, they remain limited in generalizing to unseen objects under one-shot settings. In this work, we propose a novel pipeline for fast and accurate one-shot 6D pose and scale estimation. Leveraging recent advances in single-view 3D generation, we first build high-fidelity textured meshes without requiring known object poses. To resolve scale ambiguity, we introduce a coarse-to-fine alignment module that estimates both object size and initial pose by matching 2D-3D features with depth information. We then generate a diversified set of plausible 3D models using text-guided generative augmentation and render them with Blender to synthesize large-scale, domain-randomized training data for pose estimation. This synthetic data bridges the domain gap and enables robust fine-tuning of pose estimators. Our method achieves state-of-the-art results on several 6D pose benchmarks, and we further validate its effectiveness on a newly collected in-the-wild dataset. Finally, we integrate our system with a dexterous hand, demonstrating its robustness in real-world robotic grasping tasks. All code, data, and models will be released to foster future research.
                     </p>
                 </div>
@@ -231,13 +295,13 @@
 
         <!-- Overview Section -->
         <section id="overview" class="mb-20">
-            <div class="bg-white rounded-xl p-8 section-card">
+            <div class="bg-gray-900 rounded-xl p-8 section-card border border-blue-500/20 shadow-lg shadow-blue-500/10">
                 <h2 class="text-3xl font-bold text-center mb-8 gradient-text">Method Overview</h2>
                 <div class="prose max-w-4xl mx-auto">
-                    <p class="text-gray-700 leading-relaxed">
+                    <p class="text-gray-300 leading-relaxed">
                         Figure 2 illustrates the overall pipeline of our method. Given an anchor RGB-D image I<sub>A</sub> containing an object of interest, our primary challenge is to estimate its 6D pose without a pre-existing 3D model, a common limitation for novel objects. To address this, as shown in the top-left of Figure 2, we first leverage recent advancements in single-view 3D generation to create a textured 3D model with a standardized orientation and scale (see Section 3.3). However, this generated model exists in a normalized space and lacks real-world scale.
                     </p>
-                    <p class="text-gray-700 leading-relaxed mt-4">
+                    <p class="text-gray-300 leading-relaxed mt-4">
                         To recover the object's true size and location in the anchor image frame, we introduce a coarse-to-fine alignment module (see Section 3.4). This module aligns the normalized generated model with the partial object observation in I<sub>A</sub>, simultaneously estimating the object's metric scale and initial 6D pose. Once the metric-scale model in the anchor view is established, we can efficiently estimate the object's pose in subsequent query RGB-D images I<sub>Q</sub> (top-right of Figure 2) using the aligned model and a robust pose estimation framework, including a pose selection module to handle potential object symmetries. The final relative transformation T<sub>A→Q</sub> is then computed from the absolute poses in both views.
                     </p>
                 </div>
@@ -254,7 +318,7 @@
 
         <!-- Video Section -->
         <!-- <section id="video" class="mb-20">
-            <div class="bg-white rounded-xl p-8 section-card">
+            <div class="bg-gray-900 rounded-xl p-8 section-card border border-blue-500/20 shadow-lg shadow-blue-500/10">
                 <h2 class="text-3xl font-bold text-center mb-8 gradient-text">Full Video</h2>
 
                 <div class="max-w-4xl mx-auto">
@@ -273,10 +337,10 @@
 
         <!-- Demo Section -->
         <section id="demo" class="mb-20">
-            <div class="bg-white rounded-xl p-8 section-card">
+            <div class="bg-gray-900 rounded-xl p-8 section-card border border-blue-500/20 shadow-lg shadow-blue-500/10">
                 <h2 class="text-3xl font-bold text-center mb-8 gradient-text">Online Demo</h2>
                 <div class="prose max-w-4xl mx-auto mb-8">
-                    <p class="text-gray-700 leading-relaxed">
+                    <p class="text-gray-300 leading-relaxed">
                         Welcome to try our online demo below! You can upload your own images to experience the 6D pose estimation of OnePoseviaGen.
                         <span class="text-gray-500">(If loading is slow, please be patient or refresh the page to retry. You can also try this demo at <a href="https://huggingface.co/spaces/ZhengGeng/OnePoseviaGen" class="text-blue-600 hover:underline hover:text-blue-800" target="_blank">Hugging Face</a>)</span>
                     </p>
@@ -287,7 +351,7 @@
                     <!-- 1:1 宽高比容器，正方形 -->
                     <div class="aspect-[8/5] rounded-lg overflow-hidden shadow-lg bg-gray-100">
                         <iframe 
-                            src="https://aa0de9e105fcebc860.gradio.live" 
+                            src="https://91a59e2b18365e4334.gradio.live" 
                             frameborder="0" 
                             class="w-full h-full rounded-lg"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -300,20 +364,20 @@
 
         <!-- Experiments Section -->
         <section id="experiments" class="mb-20">
-            <div class="bg-white rounded-xl p-8 section-card">
+            <div class="rounded-xl p-8 section-card">
                 <h2 class="text-3xl font-bold text-center mb-8 gradient-text">Experiments</h2>
                 
                 <div class="prose max-w-4xl mx-auto">
-                    <p class="text-gray-700 leading-relaxed">
+                    <p class="text-gray-300 leading-relaxed">
                         <span class="font-bold">Public datasets.</span> We evaluated our method on three challenging public datasets: YCBInEOAT (robotic interaction), Toyota-Light (TOYL) (challenging lighting), and LINEMOD Occlusion (LM-O) (cluttered, occluded, textureless objects).
                     </p>
-                    <p class="text-gray-700 leading-relaxed mt-4">
+                    <p class="text-gray-300 leading-relaxed mt-4">
                         <span class="font-bold">Real-world evaluation.</span> We performed two experiments in real-world settings: (1) 6D pose estimation for uncommon objects by generating synthetic training data via our domain randomization pipeline and testing on a calibrated real set, and (2) robotic manipulation tasks, establishing grasping setups using a ROKAE robot arm equipped with an XHAND1 dexterous hand, and two AgileX PiPERs, and measuring success rates against baselines.
                     </p>
-                    <p class="text-gray-700 leading-relaxed mt-4">
+                    <p class="text-gray-300 leading-relaxed mt-4">
                         <span class="font-bold">The two examples displayed below are randomly selected from our collection to enhance the page loading speed. Should you wish to explore further, simply click on the 'Load More' button to view additional examples.</span>
                     </p>
-                    <p class="text-gray-700 leading-relaxed mt-4">
+                    <p class="text-gray-300 leading-relaxed mt-4">
                     </p>
                 </div>                
                 
@@ -322,7 +386,7 @@
 
                 <!-- 添加“加载更多”按钮 -->
                 <div class="flex justify-center mt-6">
-                    <button id="load-more-btn" class="px-16 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">Load More</button>
+                    <button id="load-more-btn" class="px-16 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full hover:from-blue-700 hover:to-purple-700 transition shadow-lg">Load More</button>
                 </div>
 
                 <script>
